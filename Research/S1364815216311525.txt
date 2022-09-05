@@ -1,0 +1,11 @@
+Peishi Jiang, Mostafa Elag, Praveen Kumar, Scott Dale Peckham, Luigi Marini, Liu Rui,
+A service-oriented architecture for coupling web service models using the Basic Model Interface (BMI),
+Environmental Modelling & Software,
+Volume 92,
+2017,
+Pages 107-118,
+ISSN 1364-8152,
+https://doi.org/10.1016/j.envsoft.2017.01.021.
+(https://www.sciencedirect.com/science/article/pii/S1364815216311525)
+Abstract: Service-oriented approach for model coupling is gradually gaining momentum. By leveraging the World Wide Web, the service-oriented approach lowers the interoperability barrier of integrating models in terms of programming languague and operating system. While such paradigm has been applied to integrate models wrapped with some standard interfaces, this paper considers the Basic Model Interface (BMI) as model interface. The advantages of BMI are that it (1) enrich the semantics of variable names, and (2) is framework-agnostic. We exposed the BMI-enabled models through web services. Then, a smart modeling framework, the Experimental Modeling Environment for Linking and Interoperability (EMELI), was enhanced into a web application (i.e., EMELI-Web) to integrate the BMI-enabled web service models. By implementing the whole orchestration in coupling TopoFlow components, we demonstrate that BMI helps connect web service models by reducing the heterogeneity of variable names, and EMELI-Web makes it convenient to couple BMI-enabled web service models.
+Keywords: Integrated modeling; Service-oriented architecture; The Basic Model Interface; EMELI-Web
