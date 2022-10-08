@@ -2,7 +2,7 @@ import { OkPacket, RowDataPacket } from 'mysql2';
 import mysql from 'mysql2';
 import ServerConfig from '../config/config';
 import { ConvertRowEntryToScenario, Scenario } from '../models/scenario.interface';
-import { Template } from '../models/template.interface';
+import { ConvertRowEntryToTemplate, Template } from '../models/template.interface';
 
 // Database connection
 const dbConnection = mysql.createConnection({
@@ -56,7 +56,7 @@ function GetScenarios(): Promise<Scenario[]> {
 function GetScenario(id: number): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<RowDataPacket[]>(
-            `SELECT * FROM scenarios WHERE id = ${id}`,
+            `SELECT * FROM scenarios WHERE pkey = ${id}`,
             (err, results) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
@@ -73,8 +73,12 @@ function GetScenario(id: number): Promise<Scenario> {
     })
 };
 
-
-function CreateScenario(scenario: Scenario): Promise<Scenario> {
+/**
+ * Adds a new scenario to the database.
+ * @param scenario The scenario object to add to the database
+ * @returns The scenario object as it appears in the database, with it's assigned id.
+ */
+function AddScenario(scenario: Scenario): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `INSERT INTO scenarios (name, last_updated, description) VALUES(${scenario.name}, ${scenario.lastUpdated}, ${scenario.description})`,
@@ -91,6 +95,12 @@ function CreateScenario(scenario: Scenario): Promise<Scenario> {
     })
 };
 
+/**
+ * Adds a template to a scenario.
+ * @param scenario The scenario object to assign the template to
+ * @param template The template object being assigned
+ * @returns The scenario object as it appears in the database.
+ */
 function AddTemplateToScenario(scenario: Scenario, template: Template): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
@@ -103,7 +113,7 @@ function AddTemplateToScenario(scenario: Scenario, template: Template): Promise<
                         reject("Error in inserting record, Missing Result Insert ID");
                     if (scenario.id)
                         GetScenario(scenario.id)
-                            .then(scenario => resolve(scenario!))
+                            .then(scenari => resolve(scenari!))
                             .catch(reject)
                     else
                         reject("The scenario object provided doesn't have an id value");
@@ -113,8 +123,79 @@ function AddTemplateToScenario(scenario: Scenario, template: Template): Promise<
     })
 };
 
-//TODO: Create MySQL Statements for the Templates, should match the functions for the Scenarios
+// --> Templates
+
+/**
+ * Retrieves all of the template records from the database.
+ * @returns An array of all of the templates currently stored in the database
+ */
+function GetTemplates(): Promise<Template[]> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<RowDataPacket[]>(
+            `SELECT * FROM templates`,
+            (err, results) => {
+                // Check for error, otherwise return requested data
+                if (err) reject(err);
+                else {
+                    let output: Template[] = [];
+                    results.forEach((entry) => {
+                        let template: Template = ConvertRowEntryToTemplate(entry);
+                        output.push(template);
+                    });
+                    resolve(output);
+                }
+            }
+        )
+    });
+}
+
+/**
+ * Attempts to get a specific template based upon its unique id.
+ * @param id The id of the template to retrieve
+ * @returns The first template object matching the passed id, undefined otherwise
+ */
+function GetTemplate(id: number): Promise<Template> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<RowDataPacket[]>(
+            `SELECT * FROM templates WHERE pkey = ${id}`,
+            (err, results) => {
+                // Check for error, otherwise return requested data
+                if (err) reject(err);
+                else {
+                    let output: Template[] = [];
+                    results.forEach((entry) => {
+                        let template: Template = ConvertRowEntryToTemplate(entry);
+                        output.push(template);
+                    });
+                    resolve(output[0]);
+                }
+            }
+        )
+    });
+}
+
+/**
+ * Adds a new template to the database.
+ * @param template The template object to store in the database
+ * @returns The template object as it appears in the database
+ */
+function AddTemplate(template: Template): Promise<Template> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `INSERT INTO scenarios (name, version, filePath, description, deprecated) VALUES(${template.name}, ${template.version},${template.filePath}, ${template.description},${template.deprecated})`,
+            (err, result) => {
+                // Check for error, otherwise attempt to get the newly created template
+                if (err) reject(err);
+                else {
+                    GetTemplate(result.insertId)
+                        .then(templat => resolve(templat!))
+                        .catch(reject)
+                }
+            }
+        )
+    });
+}
 
 
 // Export the queries
-export { GetScenarios, GetScenario, CreateScenario, AddTemplateToScenario };
+export { GetScenarios, GetScenario, AddScenario, AddTemplateToScenario, GetTemplates, GetTemplate, AddTemplate };
