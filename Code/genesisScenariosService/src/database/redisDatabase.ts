@@ -42,11 +42,9 @@ export const getIpAddress = () => {
             }
         });
     }
-    console.log(ipv4Addresses);
     // Select the first address that is not local host (127)
     for (const address of ipv4Addresses) {
         if (!address.includes('127.0.0.1')) {
-            console.log(`selected address ${address}`)
             return address;
         }
     }
