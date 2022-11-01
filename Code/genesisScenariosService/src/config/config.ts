@@ -1,17 +1,23 @@
 export interface ServerConfiguration {
     port: number;
-    dbHost: string;
-    dbUser: string;
+    dbHostIp: string;
+    dbUsername: string;
     dbPassword: string;
     dbSchema: string;
+    redisIp: string;
+    redisPort: number;
+    debug: boolean;
 }
 
 const ServerConfig: ServerConfiguration = {
     port: 8000,
-    dbHost: '172.28.224.120',
-    dbUser: 'root',
+    dbHostIp: '172.29.175.215',
+    dbUsername: 'root',
     dbPassword: 'RootersKewl!234',
-    dbSchema: 'genesis_scenarios'
+    dbSchema: 'genesis_scenarios',
+    redisIp: '172.29.175.215',
+    redisPort: 6379,
+    debug: true,
 };
 
 export default ServerConfig;

@@ -1,10 +1,9 @@
 import { RowDataPacket } from "mysql2";
-import { Template } from "./template.interface";
 
 export interface Scenario {
-    id?: number,
+    id?: number;
     name: string;
-    lastUpdated: Date;
+    lastUpdated: string;
     description: string;
     templateIds: Array<number>;
 }
@@ -15,9 +14,21 @@ function ConvertRowEntryToScenario(entry: RowDataPacket): Scenario {
         name: entry.name,
         lastUpdated: entry.last_updated,
         description: entry.description,
-        templateIds: entry.templates.split(',')
+        templateIds: entry.templates ? entry.templates.split(',') : []
     }
     return scenario;
 }
 
-export { ConvertRowEntryToScenario }
+function ConvertJsonToScenario(entry: any): Scenario | undefined {
+    if (!entry || !entry.id || !entry.name || !entry.lastUpdated || !entry.description || !entry.templateIds) return undefined;
+    let scenario: Scenario = {
+        id: entry.id,
+        name: entry.name,
+        lastUpdated: entry.last_updated,
+        description: entry.description,
+        templateIds: entry.templateIds
+    };
+    return scenario;
+}
+
+export { ConvertRowEntryToScenario, ConvertJsonToScenario }

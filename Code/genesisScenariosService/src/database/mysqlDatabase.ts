@@ -5,14 +5,45 @@ import { ConvertRowEntryToScenario, Scenario } from '../models/scenario.interfac
 import { ConvertRowEntryToTemplate, Template } from '../models/template.interface';
 
 // Database connection
-const dbConnection = mysql.createConnection({
-    host: ServerConfig.dbHost,
-    user: ServerConfig.dbUser,
-    password: ServerConfig.dbPassword,
-    database: ServerConfig.dbSchema
-});
+let dbConnection: mysql.Connection;
+function connectToMySql(dbIp: string, dbUsername: string, dbUserPasswword: string, dbSchema: string) {
+    return new Promise((resolve, reject) => {
+        dbConnection = mysql.createConnection({
+            host: dbIp,
+            user: dbUsername,
+            password: dbUserPasswword,
+            database: dbSchema
+        });
 
-export default dbConnection;
+        dbConnection.connect(err => {
+            if (err) reject(err);
+            else resolve('');
+        });
+    });
+};
+export default connectToMySql;
+
+// Helper Functions
+function ConvertDateToMySqlDate(jsDate: Date): string {
+    // create the array to store
+    let formattedDate: string[] = [];
+    // Add the year
+    formattedDate.push(jsDate.getFullYear().toString() + "-");
+    // Add the month
+    formattedDate.push(("0" + (jsDate.getMonth() + 1)).slice(-2) + "-");
+    // Add the day
+    formattedDate.push(("0" + jsDate.getDate()).slice(-2) + " ");
+    // Add the hours
+    formattedDate.push(("0" + jsDate.getHours()).slice(-2) + ":");
+    // Add the minutes
+    formattedDate.push(("0" + jsDate.getMinutes()).slice(-2) + ":");
+    // Add the seconds
+    formattedDate.push(("0" + jsDate.getSeconds()).slice(-2));
+    // Return the formatted string
+    return formattedDate.join('');
+}
+
+export { ConvertDateToMySqlDate };
 
 // Database Queries
 
@@ -21,15 +52,14 @@ export default dbConnection;
 /**
  * Retrieves all of the scenarios records currently stored in the database
  * @returns A Promise that will return an array of the scenario objects currently
- *  stored in the database if fufilled, otherwise the error received from the
- *  database.
+ *  stored in the database if fufilled, otherwise undefined empty array.
  */
 function GetScenarios(): Promise<Scenario[]> {
     return new Promise((resolve, reject) => {
         dbConnection.query<RowDataPacket[]>(
             `SELECT s.*, GROUP_CONCAT(DISTINCT t.pkey ORDER BY t.pkey ASC SEPARATOR ',') as templates FROM scenarios s
-            INNER JOIN scenario_templates st ON s.pkey = st.scenario_id
-            INNER JOIN templates t ON st.template_id = t.pkey
+            LEFT JOIN scenario_templates st ON s.pkey = st.scenario_id
+            LEFT JOIN templates t ON st.template_id = t.pkey
             GROUP BY s.pkey`,
             (err, results) => {
                 // Check for error, otherwise return requested data
@@ -51,12 +81,15 @@ function GetScenarios(): Promise<Scenario[]> {
  * Retrieves a particular scenario based upon it's unique id.
  * @param id The id number of the scenario to retrieve
  * @returns A Promise that will return the first record with the passed id if
- *  fulfilled, otheriwse the error message receieved from the database.
+ *  fulfilled, otherwise undefined.
  */
 function GetScenario(id: number): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<RowDataPacket[]>(
-            `SELECT * FROM scenarios WHERE pkey = ${id}`,
+            `SELECT s.*, GROUP_CONCAT(DISTINCT t.pkey ORDER BY t.pkey ASC SEPARATOR ',') as templates FROM scenarios s
+            LEFT JOIN scenario_templates st ON s.pkey = st.scenario_id
+            LEFT JOIN templates t ON st.template_id = t.pkey
+            WHERE s.pkey = ${id} GROUP BY s.pkey`,
             (err, results) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
@@ -87,7 +120,7 @@ function AddScenario(scenario: Scenario): Promise<Scenario> {
                 if (err) reject(err);
                 else {
                     GetScenario(result.insertId)
-                        .then(scenario => resolve(scenario!))
+                        .then(scenari => resolve(scenari!))
                         .catch(reject)
                 }
             }
@@ -96,23 +129,66 @@ function AddScenario(scenario: Scenario): Promise<Scenario> {
 };
 
 /**
- * Adds a template to a scenario.
- * @param scenario The scenario object to assign the template to
- * @param template The template object being assigned
- * @returns The scenario object as it appears in the database.
+ * Updates the scenario record in the database to match the passed scenario object.
+ * @param scenario the scenario object to update in the database
+ * @returns The updated scenario object as it appears in the database, otherwise undefined.
  */
-function AddTemplateToScenario(scenario: Scenario, template: Template): Promise<Scenario> {
+function UpdateScenario(scenario: Scenario): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
-            `INSERT INTO scenario_templates (scenario_id, template_id) VALUES(${scenario.id}, ${template.id})`,
+            `UPDATE scenarios SET name='${scenario.name}', last_updated='${scenario.lastUpdated}', description='${scenario.description}' WHERE pkey=${scenario.id}`,
+            (err, result) => {
+                // Check for an error, otherwise return the updated template
+                if (err) reject(err);
+                else {
+                    GetScenario(scenario.id as number)
+                        .then(scenari => resolve(scenari!))
+                        .catch(reject)
+                }
+            }
+        )
+    });
+};
+
+/**
+ * Attempts to remove the scenario from the database
+ * @param scenarioId The scenarioId to remove from the database.
+ * @returns The number of items removed from the database.
+ */
+function RemoveScenario(scenarioId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `DELETE FROM scenarios WHERE pkey=${scenarioId}`,
+            (err, result) => {
+                // Check for an error, otherwise return the updated template
+                if (err) reject(err);
+                else resolve(result.affectedRows);
+            }
+        )
+    });
+};
+
+
+// --> Scenario Template Connections
+
+/**
+ * Adds a template to a scenario.
+ * @param scenarioId The scenarioId to assign the template to
+ * @param templateId The templateId being assigned
+ * @returns The scenario object as it appears in the database.
+ */
+function AddTemplateToScenario(scenarioId: number, templateId: number): Promise<Scenario> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `INSERT INTO scenario_templates (scenario_id, template_id) VALUES(${scenarioId}, ${templateId})`,
             (err, result) => {
                 // Check for error, otherwise attempt to get the newly created scenario
                 if (err) reject(err);
                 else {
                     if (!result.insertId)
                         reject("Error in inserting record, Missing Result Insert ID");
-                    if (scenario.id)
-                        GetScenario(scenario.id)
+                    if (scenarioId)
+                        GetScenario(scenarioId)
                             .then(scenari => resolve(scenari!))
                             .catch(reject)
                     else
@@ -123,11 +199,68 @@ function AddTemplateToScenario(scenario: Scenario, template: Template): Promise<
     })
 };
 
+/**
+ * Removes a template from a scenario.
+ * @param scenarioId The scenarioId containing the template.
+ * @param templateId The templateId to be removed from the scenario.
+ * @returns The number of items removed.
+ */
+function RemoveTemplateFromScenario(scenarioId: number, templateId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `DELETE FROM scenario_templates WHERE scenario_id=${scenarioId} AND template_id=${templateId}`,
+            (err, result) => {
+                // Check for error, otherwise return the number of removed entries
+                if (err) reject(err);
+                else resolve(result.affectedRows);
+            }
+        )
+    })
+};
+
+/**
+ * Removes the templates connected to a specified scenario.
+ * @param scenarioId The scenarioId being removed
+ * @returns The number of items removed from the database.
+ */
+function RemoveScenarioTemplates(scenarioId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `DELETE FROM scenario_templates WHERE scenario_id=${scenarioId}`,
+            (err, result) => {
+                // Check for error, otherwise return the number of removed entries
+                if (err) reject(err);
+                else resolve(result.affectedRows);
+            }
+        )
+    })
+};
+
+/**
+ * Removes a specific template from all of the scenarios.
+ * @param templateId the templateId being removed from the database
+ * @returns The number of items removed from the database.
+ */
+function RemoveTemplateFromScenarios(templateId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `DELETE from scenario_templates WHERE template_id=${templateId}`,
+            (err, result) => {
+                // Check for error, otherwise return the number of removed entries
+                if (err) reject(err);
+                else resolve(result.affectedRows);
+            }
+        )
+    });
+}
+
+
 // --> Templates
 
 /**
  * Retrieves all of the template records from the database.
- * @returns An array of all of the templates currently stored in the database
+ * @returns An array of all of the templates currently stored in the database,
+ * otherwise an empty undefined array.
  */
 function GetTemplates(): Promise<Template[]> {
     return new Promise((resolve, reject) => {
@@ -152,7 +285,7 @@ function GetTemplates(): Promise<Template[]> {
 /**
  * Attempts to get a specific template based upon its unique id.
  * @param id The id of the template to retrieve
- * @returns The first template object matching the passed id, undefined otherwise
+ * @returns The first template object matching the passed id, otherwise undefined
  */
 function GetTemplate(id: number): Promise<Template> {
     return new Promise((resolve, reject) => {
@@ -172,7 +305,7 @@ function GetTemplate(id: number): Promise<Template> {
             }
         )
     });
-}
+};
 
 /**
  * Adds a new template to the database.
@@ -182,7 +315,7 @@ function GetTemplate(id: number): Promise<Template> {
 function AddTemplate(template: Template): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
-            `INSERT INTO scenarios (name, version, filePath, description, deprecated) VALUES(${template.name}, ${template.version},${template.filePath}, ${template.description},${template.deprecated})`,
+            `INSERT INTO scenarios (name, version, filepath, description) VALUES('${template.name}', '${template.version}','${template.filePath}', '${template.description}')`,
             (err, result) => {
                 // Check for error, otherwise attempt to get the newly created template
                 if (err) reject(err);
@@ -194,8 +327,49 @@ function AddTemplate(template: Template): Promise<Template> {
             }
         )
     });
-}
+};
 
+/**
+ * Updates the template record in the database to match the passed template object.
+ * @param template the template object to update in the database
+ * @returns The updated template object as it appears in the database, otherwise undefined.
+ */
+function UpdateTemplate(template: Template): Promise<Template> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `UPDATE templates SET name='${template.name}', version='${template.version}', filepath='${template.filePath}', description='${template.description}' WHERE pkey=${template.id}`,
+            (err, result) => {
+                // Check for an error, otherwise return the updated template
+                if (err) reject(err);
+                else {
+                    GetTemplate(template.id as number)
+                        .then(templat => resolve(templat!))
+                        .catch(reject)
+                }
+            }
+        )
+    });
+};
+
+/**
+ * Attempts to remove the specified template from the database.
+ * @param templateId The templateId to remove from the database
+ * @returns The number of items removed from the database.
+ */
+function RemoveTemplate(templateId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `DELETE FROM templates WHERE pkey=${templateId}`,
+            (err, result) => {
+                // Check for an error, otherwise return the updated template
+                if (err) reject(err);
+                else resolve(result.affectedRows);
+            }
+        )
+    });
+};
 
 // Export the queries
-export { GetScenarios, GetScenario, AddScenario, AddTemplateToScenario, GetTemplates, GetTemplate, AddTemplate };
+export { GetScenarios, GetScenario, AddScenario, UpdateScenario, RemoveScenario };
+export { AddTemplateToScenario, RemoveTemplateFromScenario, RemoveScenarioTemplates, RemoveTemplateFromScenarios };
+export { GetTemplates, GetTemplate, AddTemplate, UpdateTemplate, RemoveTemplate };

@@ -6,7 +6,6 @@ export interface Template {
     version: string;
     filePath: string;
     description: string;
-    deprecated: boolean;
 }
 
 function ConvertRowEntryToTemplate(entry: RowDataPacket): Template {
@@ -16,9 +15,20 @@ function ConvertRowEntryToTemplate(entry: RowDataPacket): Template {
         version: entry.version,
         filePath: entry.filepath,
         description: entry.description,
-        deprecated: entry.deprecated[0] === 1
     }
     return template;
 }
 
-export { ConvertRowEntryToTemplate }
+function ConvertJsonToTemplate(entry: any): Template | undefined {
+    if (!entry || !entry.id || !entry.name || !entry.version || !entry.filePath || !entry.description) return undefined;
+    let template: Template = {
+        id: entry.id,
+        name: entry.name,
+        version: entry.version,
+        filePath: entry.filePath,
+        description: entry.description,
+    };
+    return template;
+}
+
+export { ConvertRowEntryToTemplate, ConvertJsonToTemplate }
