@@ -32,11 +32,11 @@ function routes(app: Express, logger: winston.Logger) {
     // (CREATE)
     app.post('/scenarios/add', (request: Request, response: Response) => {
         // Make sure all of the data was delivered from the request
-        if (request.body.name && request.body.Description) {
+        if (request.body.name && request.body.description) {
             try {
                 // Attempt to add passed data to variables
                 let scnName: string = request.body.name;
-                let scnDescription: string = request.body.Description;
+                let scnDescription: string = request.body.description;
                 // Get today's date
                 let scnLastUpdated: string = ConvertDateToMySqlDate(new Date(Date.now()));
                 AddScenarioLogic(response, logger, scnName, scnDescription, scnLastUpdated);
@@ -105,13 +105,13 @@ function routes(app: Express, logger: winston.Logger) {
     // (CREATE)
     app.post('/templates/add', (request: Request, response: Response) => {
         // Make sure all of the data was delivered from the request
-        if (request.body.name && request.body.version && request.body.filepath && request.body.Description) {
+        if (request.body.name && request.body.version && request.body.filepath && request.body.description) {
             try {
                 let tempName: string = request.body.name;
                 let tempVersion: string = request.body.version;
                 let tempFilePath: string = request.body.filepath;
-                let tempDescription: string = request.body.Description;
-                AddTemplateLogic(response, logger, tempName, tempVersion, tempFilePath, tempDescription);
+                let tempDescription: string = request.body.description;
+                AddTemplateLogic(response, logger, tempName, tempDescription, tempVersion, tempFilePath,);
             } catch (error) {
                 logger.info("Request provided an incorrect data type for at least one template field");
                 response.status(400).json({ 'error': 'The passed template object field had an incorrect data type, should all have the string type' });

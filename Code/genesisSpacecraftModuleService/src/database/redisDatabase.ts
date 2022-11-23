@@ -1,5 +1,5 @@
 import { networkInterfaces } from 'os';
-import redis, { createClient, RedisClientType } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 import winston from 'winston';
 import { ServerConfiguration } from '../config/config';
 
@@ -33,11 +33,11 @@ const redisConnection = (config: ServerConfiguration, logger: winston.Logger) =>
     });
 
     redisClient.on('connect', () => {
-        // logger.info('Connected to Redis!');
+        logger.info('Connected to Redis!');
     });
 
     redisClient.on('end', () => {
-        // logger.info('Disconnected from Redis!');
+        logger.info('Disconnected from Redis!');
     });
 
     redisClient.on('reconnecting', () => {

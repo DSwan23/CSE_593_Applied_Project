@@ -1,0 +1,74 @@
+{
+    "spacecraft": {
+        "properties": [
+            {
+                "name": "id",
+                "databaseName": "pkey",
+                "type": "int",
+                "description": "The unique identification number for this spacecraft"
+            },
+            {
+                "name": "name",
+                "databaseName": "name",
+                "type": "string",
+                "validationRules": [
+                    {
+                        "type": "less_than",
+                        "value": 25,
+                        "property": "length"
+                    }
+                ],
+                "description": "The common name for this spacecraft"
+            },
+            {
+                "name": "constellation",
+                "databaseName": "constellation",
+                "type": "string",
+                "validationRules": [
+                    {
+                        "type": "less_than",
+                        "value": 25,
+                        "property": "length"
+                    }
+                ],
+                "description": "The constellation, or group, that this spacecraft belongs to"
+            },
+            {
+                "name": "rx",
+                "databaseName": "rx",
+                "type": "double",
+                "description": "The x position at the scenario epoch"
+            },
+            {
+                "name": "ry",
+                "databaseName": "ry",
+                "type": "double",
+                "description": "The y position at the scenario epoch"
+            },
+            {
+                "name": "rz",
+                "databaseName": "rz",
+                "type": "double",
+                "description": "The z position at the scenario epoch"
+            },
+            {
+                "name": "vx",
+                "databaseName": "vx",
+                "type": "double",
+                "description": "The x velocity at the scenario epoch"
+            },
+            {
+                "name": "vy",
+                "databaseName": "vy",
+                "type": "double",
+                "description": "The y velocity at the scenario epoch"
+            },
+            {
+                "name": "vz",
+                "databaseName": "vz",
+                "type": "double",
+                "description": "The z velocity at the scenario epoch"
+            }
+        ]
+    }
+}

@@ -7,11 +7,10 @@ export interface ServerConfiguration {
     redisIp: string;
     redisPort: number;
     debug: boolean;
-    keepAliveSecs: number;
 }
 
 const ServerConfig: ServerConfiguration = {
-    port: 8001,
+    port: 8000,
     dbHostIp: 'localhost',
     dbUsername: 'doug',
     dbPassword: 'RubutsKewl!234',
@@ -19,7 +18,6 @@ const ServerConfig: ServerConfiguration = {
     redisIp: 'localhost',
     redisPort: 6379,
     debug: true,
-    keepAliveSecs: 30,
 };
 
 export default ServerConfig;

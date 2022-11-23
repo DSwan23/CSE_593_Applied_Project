@@ -199,9 +199,9 @@ function RemoveTemplateLogic(response: Response, templateId: number, logger: win
     });
 }
 
-function AddTemplateLogic(response: Response, logger: winston.Logger, name: string, description: string, version: string, filePath: string) {
+function AddTemplateLogic(response: Response, logger: winston.Logger, name: string, description: string, version: string, filepath: string) {
     // Create a new template object
-    let newTemplate: Template = { name: name, description: description, version: version, filePath: filePath };
+    let newTemplate: Template = { name: name, description: description, version: version, filepath: filepath };
     // Attempt to add that scenario object to the database
     AddTemplate(newTemplate).then((addedTemplate) => {
         // Return the newly added scenario

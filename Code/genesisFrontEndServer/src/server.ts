@@ -1,14 +1,11 @@
 import express from 'express';
-import helmet from 'helmet';
-import ServerConfig from './config/config';
-import './database/mysqlDatabase';
+import path from 'path';
 import routes from './routes/routes';
 import winston, { createLogger } from 'winston';
 import { logger, errorLogger } from 'express-winston';
-import connectToMySql from './database/mysqlDatabase';
-import redisConnection, { getIpAddress } from './database/redisDatabase';
-import cors from 'cors';
-
+import helmet from 'helmet';
+import ServerConfig from './config/config';
+import redisConnection from './database/redisDatabase';
 
 // --> Setup logging
 // configure the winston logger
@@ -43,11 +40,6 @@ if (ServerConfig.debug) {
     }))
 }
 
-// Connect to the database
-connectToMySql(ServerConfig.dbHostIp, ServerConfig.dbUsername, ServerConfig.dbPassword, ServerConfig.dbSchema)
-    .then(() => { commonLogger.info(`Successfully connected to database at ${ServerConfig.dbHostIp}`); })
-    .catch((error) => { commonLogger.error(`Failed to connect to database at ${ServerConfig.dbHostIp} because ${error}`) });
-
 // Connect to redis database
 redisConnection(ServerConfig, commonLogger);
 
@@ -59,10 +51,12 @@ const app = express();
 app.use(expressReqLogger);
 // Basic Security
 app.use(helmet());
-// Allow CORS
-app.use(cors());
 // Parse request json data
 app.use(express.json());
+
+// Set the this front end server to serve the React Application Files
+// Allows us to serve the react application we built from this node server
+app.use(express.static(path.resolve(__dirname, '../../../../genesisFrontEnd/dist')));
 
 // Setup the routes to be used by this service
 routes(app, commonLogger);
@@ -73,5 +67,5 @@ app.use(expressErrLogger);
 
 // Start the server listening on our port
 app.listen(ServerConfig.port, () => {
-    commonLogger.info(`Genesis Scenario Service Started, Listening on port ${ServerConfig.port}`);
+    commonLogger.info(`Genesis Front End Server Started, Listening on port ${ServerConfig.port}`);
 })

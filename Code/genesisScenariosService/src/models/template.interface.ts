@@ -4,7 +4,7 @@ export interface Template {
     id?: number;
     name: string;
     version: string;
-    filePath: string;
+    filepath: string;
     description: string;
 }
 
@@ -13,19 +13,19 @@ function ConvertRowEntryToTemplate(entry: RowDataPacket): Template {
         id: entry.pkey,
         name: entry.name,
         version: entry.version,
-        filePath: entry.filepath,
+        filepath: entry.filepath,
         description: entry.description,
     }
     return template;
 }
 
 function ConvertJsonToTemplate(entry: any): Template | undefined {
-    if (!entry || !entry.id || !entry.name || !entry.version || !entry.filePath || !entry.description) return undefined;
+    if (!entry || !entry.id || !entry.name || !entry.version || !entry.filepath || !entry.description) return undefined;
     let template: Template = {
         id: entry.id,
         name: entry.name,
         version: entry.version,
-        filePath: entry.filePath,
+        filepath: entry.filepath,
         description: entry.description,
     };
     return template;

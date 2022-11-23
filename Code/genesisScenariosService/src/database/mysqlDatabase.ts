@@ -6,12 +6,12 @@ import { ConvertRowEntryToTemplate, Template } from '../models/template.interfac
 
 // Database connection
 let dbConnection: mysql.Connection;
-function connectToMySql(dbIp: string, dbUsername: string, dbUserPasswword: string, dbSchema: string) {
+function connectToMySql(dbIp: string, dbUsername: string, dbUserPassword: string, dbSchema: string) {
     return new Promise((resolve, reject) => {
         dbConnection = mysql.createConnection({
             host: dbIp,
             user: dbUsername,
-            password: dbUserPasswword,
+            password: dbUserPassword,
             database: dbSchema
         });
 
@@ -99,7 +99,7 @@ function GetScenario(id: number): Promise<Scenario> {
                         let scenario: Scenario = ConvertRowEntryToScenario(entry);
                         output.push(scenario);
                     });
-                    resolve(output[0]);
+                    resolve(output[0] as Scenario);
                 }
             }
         )
@@ -112,9 +112,11 @@ function GetScenario(id: number): Promise<Scenario> {
  * @returns The scenario object as it appears in the database, with it's assigned id.
  */
 function AddScenario(scenario: Scenario): Promise<Scenario> {
+    console.log(scenario);
+    console.log(`INSERT INTO scenarios (name, last_updated, description) VALUES ('${scenario.name}', '${scenario.lastUpdated}', '${scenario.description}')`)
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
-            `INSERT INTO scenarios (name, last_updated, description) VALUES(${scenario.name}, ${scenario.lastUpdated}, ${scenario.description})`,
+            `INSERT INTO scenarios (name, last_updated, description) VALUES ('${scenario.name}', '${scenario.lastUpdated}', '${scenario.description}')`,
             (err, result) => {
                 // Check for error, otherwise attempt to get the newly created scenario
                 if (err) reject(err);
@@ -300,7 +302,7 @@ function GetTemplate(id: number): Promise<Template> {
                         let template: Template = ConvertRowEntryToTemplate(entry);
                         output.push(template);
                     });
-                    resolve(output[0]);
+                    resolve(output[0] as Template);
                 }
             }
         )
@@ -315,7 +317,7 @@ function GetTemplate(id: number): Promise<Template> {
 function AddTemplate(template: Template): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
-            `INSERT INTO scenarios (name, version, filepath, description) VALUES('${template.name}', '${template.version}','${template.filePath}', '${template.description}')`,
+            `INSERT INTO templates (name, version, filepath, description) VALUES('${template.name}', '${template.version}','${template.filepath}', '${template.description}')`,
             (err, result) => {
                 // Check for error, otherwise attempt to get the newly created template
                 if (err) reject(err);
@@ -337,7 +339,7 @@ function AddTemplate(template: Template): Promise<Template> {
 function UpdateTemplate(template: Template): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
-            `UPDATE templates SET name='${template.name}', version='${template.version}', filepath='${template.filePath}', description='${template.description}' WHERE pkey=${template.id}`,
+            `UPDATE templates SET name='${template.name}', version='${template.version}', filepath='${template.filepath}', description='${template.description}' WHERE pkey=${template.id}`,
             (err, result) => {
                 // Check for an error, otherwise return the updated template
                 if (err) reject(err);
