@@ -1,6 +1,6 @@
 export class Spacecraft {
     // Properties
-    dataTemplateVersion?: string = "v1";
+    dataTemplateVersion?: string = "v2";
     id?: number;
     name: string;
     constellation: string;

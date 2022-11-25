@@ -8,6 +8,7 @@ import { logger, errorLogger } from 'express-winston';
 import connectToMySql from './database/mysqlDatabase';
 import redisConnection, { getIpAddress } from './database/redisDatabase';
 import { CustomMiddleware } from './routes/middleware';
+import cors from 'cors';
 
 
 // --> Setup logging
@@ -57,8 +58,10 @@ const app = express();
 // --> Middleware
 // Log any incoming requests
 app.use(expressReqLogger);
+// Allow CORS
+app.use(cors());
 // Basic Security
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false, }));
 // Parse request json data
 app.use(express.json());
 // Apply custom middleware

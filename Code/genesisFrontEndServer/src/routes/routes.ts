@@ -8,7 +8,8 @@ function routes(app: Express, logger: winston.Logger) {
     app.get('/api/', (request: Request, response: Response) => {
     });
     // Return the Genesis React Application for all other routes
-    app.get('*', (request: Request, response: Response) => {
+    app.get('/', (request: Request, response: Response) => {
+        response.send('Hello World!');
     });
 
 

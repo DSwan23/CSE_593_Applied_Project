@@ -2,7 +2,7 @@ import { SyntheticEvent, useState } from "react";
 import Button from "react-bootstrap/Button";
 import AvailableTemplates from "../availableTemplates/AvailableTemplates";
 import { FloatingLabel, Form } from "react-bootstrap";
-import { useAddNewScenarioMutation, useAddTemplateToScenarioMutation, useGetScenarioQuery } from "../../store/slices/GenesisScenarioAPI";
+import { useAddNewScenarioMutation, useAddTemplateToScenarioMutation } from "../../store/slices/GenesisScenarioAPI";
 
 // ==> Component property definition
 interface CreateScenarioPageProps {
@@ -18,7 +18,6 @@ const CreateScenarioPage = (props: CreateScenarioPageProps) => {
     const [description, setDescription] = useState("");
     const [addScenario, { isLoading: isAddingScenario }] = useAddNewScenarioMutation();
     const [linkTemplateToScenario] = useAddTemplateToScenarioMutation();
-    // const [getScenario, { data: newScenario = [] }] = useGetScenarioQuery("");
 
     // Function to track currently selected template
 

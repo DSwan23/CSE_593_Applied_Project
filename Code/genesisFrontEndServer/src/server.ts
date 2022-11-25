@@ -6,6 +6,7 @@ import { logger, errorLogger } from 'express-winston';
 import helmet from 'helmet';
 import ServerConfig from './config/config';
 import redisConnection from './database/redisDatabase';
+import cors from 'cors';
 
 // --> Setup logging
 // configure the winston logger
@@ -49,14 +50,20 @@ const app = express();
 // --> Middleware
 // Log any incoming requests
 app.use(expressReqLogger);
+// Allow CORS
+app.use(cors());
 // Basic Security
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false, }));
 // Parse request json data
 app.use(express.json());
 
 // Set the this front end server to serve the React Application Files
 // Allows us to serve the react application we built from this node server
-app.use(express.static(path.resolve(__dirname, '../../../../genesisFrontEnd/dist')));
+console.log(path.resolve(__dirname, '../../TemplateDatabase'));
+app.use(express.static(path.resolve(__dirname, '../../genesisFrontEnd/dist/')));
+
+// Set this front end server to serve the template flat file database
+app.use('/TemplateDatabase', express.static(path.resolve(__dirname, '../../TemplateDatabase')));
 
 // Setup the routes to be used by this service
 routes(app, commonLogger);

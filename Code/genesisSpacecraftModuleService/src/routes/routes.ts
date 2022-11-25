@@ -45,9 +45,9 @@ const routes = (app: Express, logger: winston.Logger) => {
     app.get('/spacecraft', (request: Request, response: Response) => {
         // Create an empty template spacecraft object, access to the queries within the object
         let spacecraft = new response.locals.dataModel.Spacecraft();
-        if (request.body.scenarioName) {
+        if (response.locals.scenario) {
             // Proceed with the request
-            GetAllSpacecraftLogic(response, logger, spacecraft, request.body.scenarioName);
+            GetAllSpacecraftLogic(response, logger, spacecraft, response.locals.scenario);
         } else {
             logger.info("Request failed to provide the scenario name in which to get the spacecraft from");
             response.status(400).json({ 'error': 'Missing the scenario name in the request' });

@@ -33,11 +33,11 @@ const redisConnection = async (config: ServerConfiguration, logger: winston.Logg
     });
 
     redisClient.on('connect', () => {
-        logger.info('Connected to Redis!');
+        // logger.info('Connected to Redis!');
     });
 
     redisClient.on('end', () => {
-        logger.info('Disconnected from Redis!');
+        // logger.info('Disconnected from Redis!');
     });
 
     redisClient.on('reconnecting', () => {

@@ -1,7 +1,5 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import CreateScenarioForm from "../createScenarioPage/CreateScenarioForm";
-import ScenarioBlock from "../scenarioSelector/ScenarioBlock";
 import ScenarioSelector from "../scenarioSelector/ScenarioSelector";
 
 // ==> Component property definition

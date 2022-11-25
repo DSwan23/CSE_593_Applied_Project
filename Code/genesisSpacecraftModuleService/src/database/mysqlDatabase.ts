@@ -45,6 +45,27 @@ export { ConvertDateToMySqlDate };
 
 // Database Queries
 
+// --> Helper queries
+function GetDatabaseTableNames(): Promise<any> {
+    return new Promise((resolve, reject) => {
+        // Switch connection over to the scenario database
+        dbConnection.changeUser({ "database": 'information_schema' }, (error) => {
+            if (error) reject(error);
+        });
+        // Run the add query
+        dbConnection.query<RowDataPacket[]>(
+            'SELECT schema_name from schemata',
+            (err, result) => {
+                // Check for error, otherwise return the id of the newly inserted object
+                if (err) reject(err);
+                else {
+                    resolve(result);
+                }
+            }
+        )
+    })
+};
+
 // --> CRUD
 function AddSpacecraft(scenarioName: string, spacecraft: any): Promise<number> {
     return new Promise((resolve, reject) => {
@@ -147,4 +168,4 @@ function RemoveSpacecraft(scenarioName: string, spacecraft: any): Promise<number
 };
 
 // Export the queries
-export { AddSpacecraft, GetAllSpacecraft, GetSpacecraft, UpdateSpacecraft, RemoveSpacecraft };
+export { AddSpacecraft, GetAllSpacecraft, GetSpacecraft, UpdateSpacecraft, RemoveSpacecraft, GetDatabaseTableNames };

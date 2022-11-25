@@ -11,7 +11,7 @@ export interface ServerConfiguration {
 }
 
 const ServerConfig: ServerConfiguration = {
-    port: 8001,
+    port: 8002,
     dbHostIp: 'localhost',
     dbUsername: 'doug',
     dbPassword: 'RubutsKewl!234',

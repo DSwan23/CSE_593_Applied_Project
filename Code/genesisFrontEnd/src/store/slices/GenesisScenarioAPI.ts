@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 // ==> API Slice
 export const GenesisScenariosApiSlice = createApi({
     reducerPath: "genesisScenariosApi",
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.40.23:8001' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8001' }),
     tagTypes: ['Scenarios', 'Templates'],
     endpoints: builder => ({
         getAllScenarios: builder.query({

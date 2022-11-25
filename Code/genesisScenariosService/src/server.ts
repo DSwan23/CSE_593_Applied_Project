@@ -57,10 +57,10 @@ const app = express();
 // --> Middleware
 // Log any incoming requests
 app.use(expressReqLogger);
-// Basic Security
-app.use(helmet());
 // Allow CORS
 app.use(cors());
+// Basic Security
+app.use(helmet({ contentSecurityPolicy: false, }));
 // Parse request json data
 app.use(express.json());
 

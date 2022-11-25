@@ -17,7 +17,7 @@ const ScenarioBlock = (props: ScenarioBlockProps) => {
         isSuccess,
         isError,
         error
-    } = useGetAllScenariosQuery();
+    } = useGetAllScenariosQuery("");
 
     // generate componets for each returned value
     let scenariosElements;
@@ -25,7 +25,7 @@ const ScenarioBlock = (props: ScenarioBlockProps) => {
         scenariosElements = <Spinner />;
     } else if (isSuccess) {
         console.log(scenarios);
-        scenariosElements = scenarios.map(scenario => <h6>{scenario.id} : {scenario.name}</h6>);
+        scenariosElements = scenarios.map((scenario: any) => <h6>{scenario.id} : {scenario.name}</h6>);
         console.log(scenariosElements);
     }
     else if (isError) {
