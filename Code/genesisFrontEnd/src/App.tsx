@@ -7,6 +7,7 @@ import PageHeader from './components/pageHeader/PageHeader'
 import ScenarioDataPage from './components/scenarioDataPage/ScenarioDataPage';
 
 function App() {
+  // Local state
 
   return (
     <div className="App" style={{ backgroundColor: "#242424" }}>
@@ -19,7 +20,7 @@ function App() {
           <CreateScenarioPage />
         </Tab>
         <Tab eventKey="Scenario_Name" title="Scenario Name Here">
-          <ScenarioDataPage scenarioId={1} scenarioName='Test_Schmea' templateDataModel={{ name: "first", constellation: "that one", rx: 10, ry: 10, rz: 1, vx: 23, vy: 54, vz: 567 }} />
+          <ScenarioDataPage scenarioId={1} />
         </Tab>
       </Tabs>
     </div>

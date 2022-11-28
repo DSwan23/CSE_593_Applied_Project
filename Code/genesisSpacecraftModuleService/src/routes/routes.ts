@@ -31,9 +31,9 @@ const routes = (app: Express, logger: winston.Logger) => {
     app.post('/spacecraft/add', async (request: Request, response: Response) => {
         // Attempt to create a template spacecraft object from the data provided
         let spacecraft = new response.locals.dataModel.Spacecraft(request.body);
-        if (spacecraft.validateSpacecraft() && request.body.scenarioName) {
+        if (spacecraft.validateSpacecraft() && response.locals.scenario) {
             // Add the spacecraft to the database
-            AddSpacecraftLogic(response, logger, spacecraft, request.body.scenarioName);
+            AddSpacecraftLogic(response, logger, spacecraft, response.locals.scenario);
         }
         else {
             logger.info("Request failed to provide all of the required spacecraft fields or the scenario name");
@@ -56,11 +56,11 @@ const routes = (app: Express, logger: winston.Logger) => {
 
     app.get('/spacecraft/:id', (request: Request, response: Response) => {
         let id: number = Number(request.params.id);
-        if (request.body.scenarioName && id) {
+        if (response.locals.scenario && id) {
             // Create a template spacecraft object, access to the queries within the object
             let spacecraft = new response.locals.dataModel.Spacecraft({ 'id': id });
             // Proceed with the request
-            GetSpacecraftLogic(response, logger, spacecraft, request.body.scenarioName);
+            GetSpacecraftLogic(response, logger, spacecraft, response.locals.scenario);
         } else {
             logger.info("Request failed to provide the scenario name in which to get the spacecraft from or a valid id number");
             response.status(400).json({ 'error': 'Missing the scenario name in the request or id was not a number' });
@@ -71,9 +71,9 @@ const routes = (app: Express, logger: winston.Logger) => {
     app.put('/spacecraft/update', (request: Request, response: Response) => {
         // Attempt to create a template spacecraft object from the data provided
         let spacecraft = new response.locals.dataModel.Spacecraft(request.body);
-        if (spacecraft.validateSpacecraft() && request.body.scenarioName) {
+        if (spacecraft.validateSpacecraft() && response.locals.scenario) {
             // Add the spacecraft to the database
-            UpdateSpacecraftLogic(response, logger, spacecraft, request.body.scenarioName);
+            UpdateSpacecraftLogic(response, logger, spacecraft, response.locals.scenario);
         }
         else {
             logger.info("Request failed to provide all of the required spacecraft fields or the scenario name");
@@ -84,11 +84,11 @@ const routes = (app: Express, logger: winston.Logger) => {
     // (DESTROY)
     app.delete('/spacecraft/remove/:id', (request: Request, response: Response) => {
         let id: number = Number(request.params.id);
-        if (request.body.scenarioName && id) {
+        if (response.locals.scenario && id) {
             // Create a template spacecraft object, access to the queries within the object
             let spacecraft = new response.locals.dataModel.Spacecraft({ 'id': id });
             // Proceed with the request
-            RemoveSpacecraftLogic(response, logger, spacecraft, request.body.scenarioName);
+            RemoveSpacecraftLogic(response, logger, spacecraft, response.locals.scenario);
         } else {
             logger.info("Request failed to provide the scenario name in which to get the spacecraft from or a valid id number");
             response.status(400).json({ 'error': 'Missing the scenario name in the request or id was not a number' });

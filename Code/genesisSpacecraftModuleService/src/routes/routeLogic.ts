@@ -65,7 +65,10 @@ function UpdateSpacecraftLogic(response: Response, logger: winston.Logger, space
 
 function RemoveSpacecraftLogic(response: Response, logger: winston.Logger, spacecraft: any, sceanrioName: string) {
     // Attempt to remove a spacecraft in the database
-    RemoveSpacecraft(sceanrioName, spacecraft).then(numberOfEntriesRemoved => { }).catch(error => {
+    RemoveSpacecraft(sceanrioName, spacecraft).then(numberOfEntriesRemoved => {
+        logger.info(`removal of spacecraft id ${spacecraft.id} resulted in ${numberOfEntriesRemoved} removed entries.`);
+        response.status(200).json({ 'info': "Successfully Removed Spacecraft" });
+    }).catch(error => {
         logger.error(`RemoveSpacecraft Error : ${error}`);
         response.status(500).json({ 'error': error.toString() });
     });

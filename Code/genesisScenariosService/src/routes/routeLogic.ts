@@ -156,6 +156,13 @@ function GetTemplateLogic(response: Response, id: number, logger: winston.Logger
 }
 
 function UpdateTemplateLogic(response: Response, template: Template, logger: winston.Logger) {
+    // Check for trailing slashes in the filepath
+    let filepath = template.filepath;
+    if (filepath.charAt(filepath.length - 1) === '/' || filepath.charAt(filepath.length - 1) === '\\') {
+        console.log(filepath);
+        template.filepath = filepath.substring(0, filepath.length - 1);
+        console.log(template.filepath);
+    }
     // Attempt to update the template in the database
     UpdateTemplate(template).then(updatedTemplateData => {
         // Check to see if anything was returned
@@ -200,6 +207,12 @@ function RemoveTemplateLogic(response: Response, templateId: number, logger: win
 }
 
 function AddTemplateLogic(response: Response, logger: winston.Logger, name: string, description: string, version: string, filepath: string) {
+    // Check for trailing slashes in the filepath
+    if (filepath.charAt(filepath.length - 1) === '/' || filepath.charAt(filepath.length - 1) === '\\') {
+        console.log(filepath);
+        filepath = filepath.substring(0, filepath.length - 1);
+        console.log(filepath);
+    }
     // Create a new template object
     let newTemplate: Template = { name: name, description: description, version: version, filepath: filepath };
     // Attempt to add that scenario object to the database

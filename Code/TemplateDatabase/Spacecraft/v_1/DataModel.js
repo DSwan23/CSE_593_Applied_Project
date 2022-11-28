@@ -1,7 +1,5 @@
 "use strict";
 export const __esModule = true;
-// const _Spacecraft = void 0;
-// export { _Spacecraft as Spacecraft };
 var Spacecraft = /** @class */ (function () {
     // Constructors
     function Spacecraft(data) {
@@ -45,6 +43,19 @@ var Spacecraft = /** @class */ (function () {
     // Display Properties
     Spacecraft.prototype.DisplayProperties = function () {
         return ["name", "constellation", "position", "velocity"];
+    };
+    // Form Fields
+    Spacecraft.prototype.FormFields = function () {
+        return [
+            { label: 'Spacecraft Name', field: 'name', type: String, altText: 'The name to assign to this spacecraft.' },
+            { label: 'Constellation', field: 'constellation', type: String, altText: 'The name of the group of satellites that the spacecraft belongs to.' },
+            { label: 'Position X', field: 'rx', type: Number, altText: 'Starting Position in the x direction.' },
+            { label: 'Position Y', field: 'ry', type: Number, altText: 'Starting Position in the y direction.' },
+            { label: 'Position Z', field: 'rz', type: Number, altText: 'Starting Position in the z direction.' },
+            { label: 'Velocity X', field: 'vx', type: Number, altText: 'Starting Velocity in the x direction.' },
+            { label: 'Velocity Y', field: 'vy', type: Number, altText: 'Starting Velocity in the y direction.' },
+            { label: 'Velocity Z', field: 'vz', type: Number, altText: 'Starting Velocity in the z direction.' },
+        ];
     };
     // Crud Operations
     Spacecraft.prototype.addQuery = function () {

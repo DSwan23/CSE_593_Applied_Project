@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
+import { Tab, Tabs } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { useGetScenarioQuery, useGetTemplateQuery } from "../../store/slices/GenesisScenarioAPI";
 import { useGetAllSpacecraftQuery } from "../../store/slices/SpacecraftDataAPI";
-import ScenarioDataDisplay from "./SceanrioDataDisplay";
+import DataModelWrapper from "./DataModelWrapper";
+import TemplateDataDisplay from "./TemplateDataDisplay";
 
 // ==> Component property definition
 interface ScenarioDataPageProps {
-    scenarioName: string;
-    templateDataModel: object;
     scenarioId: number;
 }
 
@@ -22,34 +22,24 @@ const ScenarioDataPage = (props: ScenarioDataPageProps) => {
         error: scenarioError
     } = useGetScenarioQuery(props.scenarioId);
 
-    // const scenarioTemplates = useMemo(() => {
-    //     // Get the template data for each template id on the scenario
-    //     let templates: any[] = [];
-    //     scenario.templateIds.forEach(async (id: string) => {
-    //         await useGetTemplateQuery((Number.parseInt(id))).unwrap().then((template: any) => templates.push(template));
-    //     });
-    //     console.log(templates);
-    // }, [scenario])
-
-    // Create a datapage for each template
-
-    // const {
-    //     data: spacecraft = [],
-    //     isLoading: isSpacecraftListLoading,
-    //     isSuccess,
-    //     isError,
-    //     error
-    // } = useGetAllSpacecraftQuery(props.scenarioName);
-
-    // Create the list of headers
-    // let dataModelHeader: string[] = [];
-    // for (let dataModelProp in props.templateDataModel) {
-    //     dataModelHeader.push(dataModelProp);
-    // }
-
+    // Create a tab for each template assigned to this scenario
+    const templateTabs: JSX.Element[] = [];
+    if (isScenarioSuccess) {
+        scenario?.templateIds.forEach((templateId: number) => {
+            templateTabs.push(
+                <Tab eventKey={`TemplateTab${templateId}`} title={`Template ${templateId}`} >
+                    <DataModelWrapper templateId={templateId} scenarioName="Test_Schmea" />
+                </Tab >
+            )
+        })
+    }
     // Render the component
+    // TODO: Use actual scenario name here
     return <div id="ScenarioDataPage" style={{ display: "flex", flexFlow: "row nowrap", color: "white", backgroundColor: "#242424" }}>
-        <ScenarioDataDisplay scenarioName="Test_Schema" templateId={1} dataHeaders={["dataModelHeader"]} data={[]} />
+        <Tabs variant='dark' style={{ height: '100%' }}>
+            {templateTabs}
+        </Tabs>
+        {/* <DataModelWrapper templateId={1} scenarioName="Test_Schmea" /> */}
     </div>
 }
 

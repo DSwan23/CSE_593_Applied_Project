@@ -10,14 +10,40 @@ export const SpacecraftDataApiSlice = createApi({
             query: (scenarioTemplateData: string[]) => ({
                 url: `/spacecraft`,
                 method: 'GET',
-                headers: [['scenario', scenarioTemplateData[0]], ['templatepath', scenarioTemplateData[1]]]// 'D:\\Git_Projects\\CSE_593_Applied_Project\\Code\\TemplateDatabase\\Spacecraft\\v_1\\']]
+                headers: [['scenario', scenarioTemplateData[0]], ['templatepath', scenarioTemplateData[1]]]
             }),
             providesTags: ['Spacecraft']
+        }),
+        addSpacecraft: builder.mutation({
+            query: (Data: any[]) => ({
+                url: `/spacecraft/add`,
+                method: 'POST',
+                headers: [['scenario', Data[0]], ['templatepath', Data[1]]],
+                body: JSON.parse(Data[2])
+            }),
+            invalidatesTags: ['Spacecraft'],
+        }),
+        updateSpacecraft: builder.mutation({
+            query: (Data: any[]) => ({
+                url: `/spacecraft/update`,
+                method: 'PUT',
+                headers: [['scenario', Data[0]], ['templatepath', Data[1]]],
+                body: JSON.parse(Data[2])
+            }),
+            invalidatesTags: ['Spacecraft'],
+        }),
+        removeSpacecraft: builder.mutation({
+            query: (Data: any[]) => ({
+                url: `/spacecraft/remove/${Data[2]}`,
+                method: 'DELETE',
+                headers: [['scenario', Data[0]], ['templatepath', Data[1]]],
+            }),
+            invalidatesTags: ['Spacecraft'],
         }),
     })
 });
 
 // ==> Export the API queries
 export const {
-    useGetAllSpacecraftQuery
+    useGetAllSpacecraftQuery, useAddSpacecraftMutation, useUpdateSpacecraftMutation, useRemoveSpacecraftMutation
 } = SpacecraftDataApiSlice;

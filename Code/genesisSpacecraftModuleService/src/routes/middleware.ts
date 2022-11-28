@@ -1,5 +1,6 @@
 import { Express, NextFunction, Request, Response } from "express";
 import { existsSync, realpathSync } from "fs";
+import path from "path";
 import winston from "winston";
 import { GetDatabaseTableNames } from "../database/mysqlDatabase";
 
@@ -16,7 +17,7 @@ export const CustomMiddleware = (app: Express, logger: winston.Logger) => {
         else {
             // Get the data model from the template database
             try {
-                const spacecraftDataModel = await import(templatePath as string + "spacecraft.ts");
+                const spacecraftDataModel = await import(path.resolve(__dirname, '..\\..\\..\\TemplateDatabase\\' + templatePath as string + "DataModel.ts"));
                 // Attach the data model to the response
                 response.locals.dataModel = spacecraftDataModel;
                 // Move on with the request

@@ -20,6 +20,7 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
 
     // Sort the scenarios
     const sortedScenarios = useMemo(() => {
+        if (!scenarios) return
         // Make a shallow copy of the original data
         const sorted: any[] = scenarios.slice();
         // Sort based on most up to date
@@ -36,7 +37,7 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
     let scenarioListElements: JSX.Element[] = [];
     let scenarioTabElements: JSX.Element[] = [];
     if (isSuccess) {
-        sortedScenarios.forEach((scenario: any) => {
+        sortedScenarios?.forEach((scenario: any) => {
             scenarioListElements.push(<ListGroupItem action variant="dark" href={'#' + scenario.id} key={scenario.id}>{scenario.name}</ListGroupItem>);
             scenarioTabElements.push(<Tab.Pane eventKey={'#' + scenario.id} key={scenario.id}>
                 <h5>{scenario.name}</h5>
