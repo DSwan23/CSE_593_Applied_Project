@@ -159,7 +159,6 @@ const redisConnection = async (config: ServerConfiguration, logger: winston.Logg
             logger.info(`Successfully collected active services and their addresses`);
             // Register for service changes
             subscribeClient.connect().then(() => {
-                console.log()
                 subscribeClient.pSubscribe('*genesis.broker*', ServiceSubscribeCallback);
             });
             // Disconnect the client

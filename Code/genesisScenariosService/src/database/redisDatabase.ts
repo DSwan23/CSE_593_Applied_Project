@@ -21,14 +21,14 @@ const redisConnection = (config: ServerConfiguration, logger: winston.Logger) =>
         let currentAddress = getIpAddress();
         if (!currentAddress) logger.error("Couldn't determine a local ip address");
         // Store the ip address in the redis database
-        redisClient.set("genesis.broker.genesisScenarioService", currentAddress as string, { EX: config.keepAliveSecs }).then(() => {
-            logger.info(`Registered service at ${currentAddress}`);
+        redisClient.set("genesis.broker.genesisScenarioService", `${currentAddress}:${config.port}`, { EX: config.keepAliveSecs }).then(() => {
+            logger.info(`Registered service at ${currentAddress}:${config.port}`);
             redisClient.disconnect();
         });
         // Keep the key alive while the service is running
         setInterval(() => {
             // @ts-ignore
-            SendKeepAlive(redisClient, currentAddress, config.keepAliveSecs).then(() => { logger.info('Sent Keep Alive'); });
+            SendKeepAlive(redisClient, `${currentAddress}:${config.port}`, config.keepAliveSecs).then(() => { logger.info('Sent Keep Alive'); });
         }, (config.keepAliveSecs - 5) * 1000);
     })
 

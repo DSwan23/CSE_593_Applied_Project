@@ -1,4 +1,4 @@
-CREATE TABLE `Test_Schmea`.`spacecraft` (
+CREATE TABLE `spacecraft` (
   `pkey` INT NOT NULL,
   `name` VARCHAR(45) NULL,
   `constellation` VARCHAR(45) NULL,

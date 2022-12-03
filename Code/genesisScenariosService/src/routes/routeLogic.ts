@@ -1,6 +1,7 @@
 import { Response } from "express";
 import winston from "winston";
-import { GetScenarios, GetScenario, UpdateScenario, UpdateTemplate, GetTemplates, GetTemplate, RemoveScenario, RemoveScenarioTemplates, RemoveTemplate, RemoveTemplateFromScenario, RemoveTemplateFromScenarios, AddScenario, AddTemplate, AddTemplateToScenario, ConvertDateToMySqlDate } from "../database/mysqlDatabase";
+import fs from "fs";
+import { GetScenarios, GetScenario, UpdateScenario, UpdateTemplate, GetTemplates, GetTemplate, RemoveScenario, RemoveScenarioTemplates, RemoveTemplate, RemoveTemplateFromScenario, RemoveTemplateFromScenarios, AddScenario, AddTemplate, AddTemplateToScenario, ConvertDateToMySqlDate, CreateScenarioDatabase, CreateTemplateTableInDatabase } from "../database/mysqlDatabase";
 import { Scenario } from "../models/scenario.interface";
 import { Template } from "../models/template.interface";
 
@@ -128,6 +129,13 @@ function AddScenarioLogic(response: Response, logger: winston.Logger, name: stri
         logger.error(`AddScenario Error : ${error}`);
         response.status(500).json({ 'error': error.toString() });
     });
+    // Attempt to create a database for the scenario
+    CreateScenarioDatabase(newScenario.name).then((result) => {
+        // Log that the database was created
+        logger.info(`Created a ${newScenario.name} database with the following result: ${result.serverStatus}`);
+    }).catch(error => {
+        logger.error(`CreateScenarioDatabase Error: ${error}`);
+    });
 }
 
 // --> Template Route Logic
@@ -237,6 +245,25 @@ function AddTemplateToScenarioLogic(response: Response, logger: winston.Logger, 
         updatedScenario.lastUpdated = ConvertDateToMySqlDate(new Date(Date.now()));
         // Call the update but it is unimportant to get a response.
         UpdateScenario(updatedScenario);
+
+        // ==> Add the template table to the scenario database
+        // Get the template from the database
+        GetTemplate(templateId).then((templateData) => {
+            // Get the template create table sql statement from the template database
+            fs.readFile(`../TemplateDatabase/${templateData.filepath}/CreateTable.sql`, (err, data) => {
+                if (err) {
+                    logger.error(`Read CreateTable.sql file read error: ${err}`);
+                    return;
+                } else {
+                    CreateTemplateTableInDatabase(data.toString(), updatedScenario.name).then(result => {
+                        logger.info(`Created ${templateData.name} table in ${updatedScenario.name} scenario.`);
+                    }).catch(error => {
+                        logger.error(`CreateTemplateTableInDatabase error: ${error}`);
+                    });
+                }
+            });
+        })
+
         // Respond to the user
         response.status(200).json(updatedScenario);
     }).catch(error => {

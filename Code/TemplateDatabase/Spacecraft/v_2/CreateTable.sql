@@ -1,4 +1,4 @@
-CREATE TABLE `Test_Schmea`.`spacecraft` (
+CREATE TABLE `spacecraft` (
   `pkey` INT NOT NULL,
   `name` VARCHAR(45) NULL,
   `constellation` VARCHAR(45) NULL,
@@ -10,4 +10,4 @@ CREATE TABLE `Test_Schmea`.`spacecraft` (
   `vz` DOUBLE NULL,
   PRIMARY KEY (`pkey`),
   UNIQUE INDEX `pkey_UNIQUE` (`pkey` ASC))
-COMMENT = 'Spacecraft table from Spacecraft Module version 1';
+COMMENT = 'Spacecraft table from Spacecraft Module version 2';

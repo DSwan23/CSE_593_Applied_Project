@@ -4,9 +4,13 @@ import ServerConfig from '../config/config';
 import { ConvertRowEntryToScenario, Scenario } from '../models/scenario.interface';
 import { ConvertRowEntryToTemplate, Template } from '../models/template.interface';
 
+// Module level variables
+let genesisSchema: string;
+
 // Database connection
 let dbConnection: mysql.Connection;
 function connectToMySql(dbIp: string, dbUsername: string, dbUserPassword: string, dbSchema: string) {
+    genesisSchema = dbSchema;
     return new Promise((resolve, reject) => {
         dbConnection = mysql.createConnection({
             host: dbIp,
@@ -66,7 +70,7 @@ function GetScenarios(): Promise<Scenario[]> {
             LEFT JOIN scenario_templates st ON s.pkey = st.scenario_id
             LEFT JOIN templates t ON st.template_id = t.pkey
             GROUP BY s.pkey`,
-            (err : any, results: any) => {
+            (err: any, results: any) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
                 else {
@@ -117,8 +121,6 @@ function GetScenario(id: number): Promise<Scenario> {
  * @returns The scenario object as it appears in the database, with it's assigned id.
  */
 function AddScenario(scenario: Scenario): Promise<Scenario> {
-    console.log(scenario);
-    console.log(`INSERT INTO scenarios (name, last_updated, description) VALUES ('${scenario.name}', '${scenario.lastUpdated}', '${scenario.description}')`)
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `INSERT INTO scenarios (name, last_updated, description) VALUES ('${scenario.name}', '${scenario.lastUpdated}', '${scenario.description}')`,
@@ -134,6 +136,24 @@ function AddScenario(scenario: Scenario): Promise<Scenario> {
         )
     })
 };
+/**
+ * Attempts to create a database with the scenario name provided.
+ * @param scenarioName The name of the scenario we are creating a database for
+ * @returns The query OkPacket.
+ */
+function CreateScenarioDatabase(scenarioName: string): Promise<OkPacket> {
+    return new Promise((resolve, reject) => {
+        dbConnection.query<OkPacket>(
+            `CREATE DATABASE ${scenarioName.split(" ").join("_")}`,
+            (err: any, result) => {
+                if (err) reject(err);
+                else {
+                    resolve(result);
+                }
+            }
+        )
+    });
+}
 
 /**
  * Updates the scenario record in the database to match the passed scenario object.
@@ -200,6 +220,29 @@ function AddTemplateToScenario(scenarioId: number, templateId: number): Promise<
                             .catch(reject)
                     else
                         reject("The scenario object provided doesn't have an id value");
+                }
+            }
+        )
+    })
+};
+
+function CreateTemplateTableInDatabase(createTableQuery: string, scenarioName: string): Promise<OkPacket> {
+    return new Promise((resolve, reject) => {
+        // Switch connection over to the scenario database
+        dbConnection.changeUser({ "database": scenarioName.split(" ").join("_") }, (error) => {
+            if (error) reject(error);
+        });
+        dbConnection.query<OkPacket>(
+            createTableQuery,
+            (err: any, result) => {
+                // Return connection back to the genesis scenario database
+                dbConnection.changeUser({ "database": genesisSchema }, (error) => {
+                    if (error) reject(error);
+                });
+                // Check for error, otherwise attempt to get the newly created scenario
+                if (err) reject(err);
+                else {
+                    resolve(result);
                 }
             }
         )
@@ -377,6 +420,6 @@ function RemoveTemplate(templateId: number): Promise<number> {
 };
 
 // Export the queries
-export { GetScenarios, GetScenario, AddScenario, UpdateScenario, RemoveScenario };
-export { AddTemplateToScenario, RemoveTemplateFromScenario, RemoveScenarioTemplates, RemoveTemplateFromScenarios };
+export { GetScenarios, GetScenario, AddScenario, UpdateScenario, RemoveScenario, CreateScenarioDatabase };
+export { AddTemplateToScenario, RemoveTemplateFromScenario, RemoveScenarioTemplates, RemoveTemplateFromScenarios, CreateTemplateTableInDatabase };
 export { GetTemplates, GetTemplate, AddTemplate, UpdateTemplate, RemoveTemplate };
