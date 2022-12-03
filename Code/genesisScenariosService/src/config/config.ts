@@ -10,6 +10,9 @@ export interface ServerConfiguration {
     keepAliveSecs: number;
 }
 
+/**
+ * Allows the user to define the variables required by this service to operate wihtin any network.
+ */
 const ServerConfig: ServerConfiguration = {
     port: 8001,
     dbHostIp: 'localhost',

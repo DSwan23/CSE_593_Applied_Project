@@ -24,6 +24,11 @@ function connectToMySql(dbIp: string, dbUsername: string, dbUserPassword: string
 export default connectToMySql;
 
 // Helper Functions
+/**
+ * Converts a javascript date into a date string that is understood by MySQL
+ * @param jsDate The javascript date object to convert
+ * @returns The string representation of the passed date in the MySQL format.
+ */
 function ConvertDateToMySqlDate(jsDate: Date): string {
     // create the array to store
     let formattedDate: string[] = [];
@@ -61,12 +66,12 @@ function GetScenarios(): Promise<Scenario[]> {
             LEFT JOIN scenario_templates st ON s.pkey = st.scenario_id
             LEFT JOIN templates t ON st.template_id = t.pkey
             GROUP BY s.pkey`,
-            (err, results) => {
+            (err : any, results: any) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
                 else {
                     let output: Scenario[] = [];
-                    results.forEach((entry) => {
+                    results.forEach((entry: any) => {
                         let scenario: Scenario = ConvertRowEntryToScenario(entry);
                         output.push(scenario);
                     });
@@ -90,7 +95,7 @@ function GetScenario(id: number): Promise<Scenario> {
             LEFT JOIN scenario_templates st ON s.pkey = st.scenario_id
             LEFT JOIN templates t ON st.template_id = t.pkey
             WHERE s.pkey = ${id} GROUP BY s.pkey`,
-            (err, results) => {
+            (err: any, results: any[]) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
                 else {
@@ -117,7 +122,7 @@ function AddScenario(scenario: Scenario): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `INSERT INTO scenarios (name, last_updated, description) VALUES ('${scenario.name}', '${scenario.lastUpdated}', '${scenario.description}')`,
-            (err, result) => {
+            (err: any, result: { insertId: number; }) => {
                 // Check for error, otherwise attempt to get the newly created scenario
                 if (err) reject(err);
                 else {
@@ -139,7 +144,7 @@ function UpdateScenario(scenario: Scenario): Promise<Scenario> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `UPDATE scenarios SET name='${scenario.name}', last_updated='${scenario.lastUpdated}', description='${scenario.description}' WHERE pkey=${scenario.id}`,
-            (err, result) => {
+            (err: any, result: any) => {
                 // Check for an error, otherwise return the updated template
                 if (err) reject(err);
                 else {
@@ -161,7 +166,7 @@ function RemoveScenario(scenarioId: number): Promise<number> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `DELETE FROM scenarios WHERE pkey=${scenarioId}`,
-            (err, result) => {
+            (err: any, result: { affectedRows: number | PromiseLike<number>; }) => {
                 // Check for an error, otherwise return the updated template
                 if (err) reject(err);
                 else resolve(result.affectedRows);
@@ -183,7 +188,7 @@ function AddTemplateToScenario(scenarioId: number, templateId: number): Promise<
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `INSERT INTO scenario_templates (scenario_id, template_id) VALUES(${scenarioId}, ${templateId})`,
-            (err, result) => {
+            (err: any, result: { insertId: any; }) => {
                 // Check for error, otherwise attempt to get the newly created scenario
                 if (err) reject(err);
                 else {
@@ -211,7 +216,7 @@ function RemoveTemplateFromScenario(scenarioId: number, templateId: number): Pro
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `DELETE FROM scenario_templates WHERE scenario_id=${scenarioId} AND template_id=${templateId}`,
-            (err, result) => {
+            (err: any, result: { affectedRows: number | PromiseLike<number>; }) => {
                 // Check for error, otherwise return the number of removed entries
                 if (err) reject(err);
                 else resolve(result.affectedRows);
@@ -229,7 +234,7 @@ function RemoveScenarioTemplates(scenarioId: number): Promise<number> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `DELETE FROM scenario_templates WHERE scenario_id=${scenarioId}`,
-            (err, result) => {
+            (err: any, result: { affectedRows: number | PromiseLike<number>; }) => {
                 // Check for error, otherwise return the number of removed entries
                 if (err) reject(err);
                 else resolve(result.affectedRows);
@@ -247,7 +252,7 @@ function RemoveTemplateFromScenarios(templateId: number): Promise<number> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `DELETE from scenario_templates WHERE template_id=${templateId}`,
-            (err, result) => {
+            (err: any, result: { affectedRows: number | PromiseLike<number>; }) => {
                 // Check for error, otherwise return the number of removed entries
                 if (err) reject(err);
                 else resolve(result.affectedRows);
@@ -268,7 +273,7 @@ function GetTemplates(): Promise<Template[]> {
     return new Promise((resolve, reject) => {
         dbConnection.query<RowDataPacket[]>(
             `SELECT * FROM templates`,
-            (err, results) => {
+            (err: any, results: any[]) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
                 else {
@@ -293,7 +298,7 @@ function GetTemplate(id: number): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<RowDataPacket[]>(
             `SELECT * FROM templates WHERE pkey = ${id}`,
-            (err, results) => {
+            (err: any, results: any[]) => {
                 // Check for error, otherwise return requested data
                 if (err) reject(err);
                 else {
@@ -318,7 +323,7 @@ function AddTemplate(template: Template): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `INSERT INTO templates (name, version, filepath, description) VALUES('${template.name}', '${template.version}','${template.filepath}', '${template.description}')`,
-            (err, result) => {
+            (err: any, result: { insertId: number; }) => {
                 // Check for error, otherwise attempt to get the newly created template
                 if (err) reject(err);
                 else {
@@ -340,7 +345,7 @@ function UpdateTemplate(template: Template): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `UPDATE templates SET name='${template.name}', version='${template.version}', filepath='${template.filepath}', description='${template.description}' WHERE pkey=${template.id}`,
-            (err, result) => {
+            (err: any, result: any) => {
                 // Check for an error, otherwise return the updated template
                 if (err) reject(err);
                 else {
@@ -362,7 +367,7 @@ function RemoveTemplate(templateId: number): Promise<number> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
             `DELETE FROM templates WHERE pkey=${templateId}`,
-            (err, result) => {
+            (err: any, result: { affectedRows: number | PromiseLike<number>; }) => {
                 // Check for an error, otherwise return the updated template
                 if (err) reject(err);
                 else resolve(result.affectedRows);

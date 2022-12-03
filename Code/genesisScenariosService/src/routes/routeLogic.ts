@@ -5,6 +5,11 @@ import { Scenario } from "../models/scenario.interface";
 import { Template } from "../models/template.interface";
 
 // --> Scenario helper
+/**
+ * Updates the last updated date on a scenario.
+ * @param scenarioId The scenario id to update the date on
+ * @param logger The service logging object
+ */
 function UpdateDateOnScenario(scenarioId: number, logger: winston.Logger) {
     // Attempt to get the scenario
     GetScenario(scenarioId).then((sceanrio) => {

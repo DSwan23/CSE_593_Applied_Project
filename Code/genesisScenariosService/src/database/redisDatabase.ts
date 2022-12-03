@@ -4,6 +4,11 @@ import winston from 'winston';
 import { ServerConfiguration } from '../config/config';
 
 // redis connection object
+/**
+ * Creates a connection to the redis database.
+ * @param config The ServerConfiguration object
+ * @param logger The logger object
+ */
 const redisConnection = (config: ServerConfiguration, logger: winston.Logger) => {
     // Create a connection to the redis database
     const redisClient = createClient({
@@ -28,7 +33,7 @@ const redisConnection = (config: ServerConfiguration, logger: winston.Logger) =>
     })
 
     // Log any Events
-    redisClient.on('error', error => {
+    redisClient.on('error', (error: string) => {
         logger.error('Redis Error: ' + error);
     });
 
@@ -50,11 +55,15 @@ const redisConnection = (config: ServerConfiguration, logger: winston.Logger) =>
 export default redisConnection;
 
 // Helper functions
+/**
+ * Gets the ip address of the machine where this service is running.
+ * @returns The ip address of the machine that this service is running on.
+ */
 export const getIpAddress = () => {
     const networkData = networkInterfaces();
     let ipv4Addresses: string[] = [];
     for (const entry in networkData) {
-        networkData[entry]?.forEach((netType) => {
+        networkData[entry]?.forEach((netType: { family: string; address: string; }) => {
             if (netType.family === 'IPv4') {
                 ipv4Addresses.push(netType.address);
             }
@@ -70,6 +79,13 @@ export const getIpAddress = () => {
     return;
 }
 
+/**
+ * Reregisters this service on a given interval.
+ * @param redisClient The redis connection in which to send the msg over
+ * @param currentAddress The ip address in which to register this service under.
+ * @param keepAliveSecs The interval in which to send the keep alive messages
+ * @returns Promise that returns no value, allows this to run asynchronously
+ */
 const SendKeepAlive = (redisClient: RedisClientType, currentAddress: string, keepAliveSecs: number) => {
     return new Promise<void>((resolve, reject) => {
         redisClient.connect().then(() => {

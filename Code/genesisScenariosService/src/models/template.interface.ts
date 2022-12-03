@@ -8,6 +8,11 @@ export interface Template {
     description: string;
 }
 
+/**
+ * Converts a mysql entry into a template object.
+ * @param entry The datapacket retrieved from a MySQL query
+ * @returns The template object representation of the provided data packet.
+ */
 function ConvertRowEntryToTemplate(entry: RowDataPacket): Template {
     let template: Template = {
         id: entry.pkey,
@@ -19,6 +24,11 @@ function ConvertRowEntryToTemplate(entry: RowDataPacket): Template {
     return template;
 }
 
+/**
+ * Converts a JSON object into a template object.
+ * @param entry The JSON object to convert
+ * @returns The template object representation of the passed JSON object.
+ */
 function ConvertJsonToTemplate(entry: any): Template | undefined {
     if (!entry || !entry.id || !entry.name || !entry.version || !entry.filepath || !entry.description) return undefined;
     let template: Template = {
@@ -31,4 +41,5 @@ function ConvertJsonToTemplate(entry: any): Template | undefined {
     return template;
 }
 
+// Export the functions so they may be used
 export { ConvertRowEntryToTemplate, ConvertJsonToTemplate }
