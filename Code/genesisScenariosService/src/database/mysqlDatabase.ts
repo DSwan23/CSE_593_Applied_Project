@@ -387,7 +387,7 @@ function AddTemplate(template: Template): Promise<Template> {
 function UpdateTemplate(template: Template): Promise<Template> {
     return new Promise((resolve, reject) => {
         dbConnection.query<OkPacket>(
-            `UPDATE templates SET name='${template.name}', version='${template.version}', filepath='${template.filepath}', description='${template.description}' WHERE pkey=${template.id}`,
+            `UPDATE templates SET name='${template.name}', version='${template.version}', filepath="${template.filepath}", description='${template.description}' WHERE pkey=${template.id}`,
             (err: any, result: any) => {
                 // Check for an error, otherwise return the updated template
                 if (err) reject(err);

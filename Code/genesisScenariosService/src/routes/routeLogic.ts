@@ -172,10 +172,10 @@ function UpdateTemplateLogic(response: Response, template: Template, logger: win
     // Check for trailing slashes in the filepath
     let filepath = template.filepath;
     if (filepath.charAt(filepath.length - 1) === '/' || filepath.charAt(filepath.length - 1) === '\\') {
-        console.log(filepath);
         template.filepath = filepath.substring(0, filepath.length - 1);
-        console.log(template.filepath);
     }
+    // Double up on remaining slashes
+    template.filepath = template.filepath.replace("/", "//").replace("\\", "\\\\");
     // Attempt to update the template in the database
     UpdateTemplate(template).then(updatedTemplateData => {
         // Check to see if anything was returned

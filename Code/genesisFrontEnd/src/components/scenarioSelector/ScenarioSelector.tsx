@@ -4,7 +4,7 @@ import { useGetAllScenariosQuery } from "../../store/slices/GenesisScenarioAPI";
 
 // ==> Component property definition
 interface ScenarioSelectorProps {
-
+    openScenarioFcn: Function;
 }
 
 // ==> React Component
@@ -18,6 +18,10 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
         error
     } = useGetAllScenariosQuery("");
 
+    // Local variables
+    let selectedScenarioId: number = -1;
+    let selectedScenarioName: string = "";
+
     // Sort the scenarios
     const sortedScenarios = useMemo(() => {
         if (!scenarios) return
@@ -27,6 +31,17 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
         sorted.sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated));
         return sorted;
     }, [scenarios]);
+
+    // Click functions
+    const selectScenario = (scenarioId: number, scenarioName: string) => {
+        selectedScenarioId = scenarioId;
+        selectedScenarioName = scenarioName;
+    }
+    const openScenario = () => {
+        if (selectedScenarioId != -1) {
+            props.openScenarioFcn(selectedScenarioId, selectedScenarioName);
+        }
+    }
 
     // Generate componets for each returned value
     let noScenarioListElement: JSX.Element = <ListGroupItem action variant="dark" href={'#1'}>No Scenarios Created Yet</ListGroupItem>;
@@ -38,7 +53,7 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
     let scenarioTabElements: JSX.Element[] = [];
     if (isSuccess) {
         sortedScenarios?.forEach((scenario: any) => {
-            scenarioListElements.push(<ListGroupItem action variant="dark" href={'#' + scenario.id} key={scenario.id}>{scenario.name}</ListGroupItem>);
+            scenarioListElements.push(<ListGroupItem action variant="dark" href={'#' + scenario.id} key={scenario.id} onClick={() => selectScenario(scenario.id, scenario.name)}>{scenario.name}</ListGroupItem>);
             scenarioTabElements.push(<Tab.Pane eventKey={'#' + scenario.id} key={scenario.id}>
                 <h5>{scenario.name}</h5>
                 <p>{scenario.description}</p>
@@ -49,7 +64,7 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
     else if (isError) { console.log(error); }
 
     // Render the component
-    return <TabContainer defaultActiveKey="#1">
+    return <TabContainer id="scenarioTabContainer">
         {isLoading ? <Spinner /> : null}
         {isError ? <div>Error Loading Scenarios</div> : null}
         <Row>
@@ -59,12 +74,12 @@ const ScenarioSelector = (props: ScenarioSelectorProps) => {
                         {scenarioListElements.length > 0 ? scenarioListElements : noScenarioListElement}
                     </ListGroup>
                     : null}
-                {!isError && !isLoading && scenarioListElements.length > 0 ? <Button style={{ margin: '10px' }}>Select Scenario</Button> : null}
+                {!isError && !isLoading && scenarioListElements.length > 0 ? <Button onClick={() => openScenario()} style={{ margin: '10px' }}>Open Scenario</Button> : null}
             </Col>
             <Col>
                 {!isError && !isLoading ?
                     <Tab.Content>
-                        {scenarioTabElements.length > 0 ? scenarioTabElements : noScenarioListElement}
+                        {scenarioTabElements.length > 0 ? scenarioTabElements : noScenarioTabElement}
                     </Tab.Content>
                     : null}
             </Col>

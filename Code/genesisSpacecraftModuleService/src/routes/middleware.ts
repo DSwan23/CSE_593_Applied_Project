@@ -17,7 +17,10 @@ export const CustomMiddleware = (app: Express, logger: winston.Logger) => {
         else {
             // Get the data model from the template database
             try {
-                const spacecraftDataModel = await import(path.resolve(__dirname, '..\\..\\..\\TemplateDatabase\\' + templatePath as string + "DataModel.ts"));
+                // Check to see if the filepath ends with a slash
+                let lastCharacter = templatePath.slice(-1);
+                let endsWithSlash = lastCharacter == "\\" || lastCharacter == "/";
+                const spacecraftDataModel = await import(path.resolve(__dirname, `..\\..\\..\\TemplateDatabase\\${templatePath}${endsWithSlash ? "" : "\\"}DataModel.ts`));
                 // Attach the data model to the response
                 response.locals.dataModel = spacecraftDataModel;
                 // Move on with the request

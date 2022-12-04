@@ -6,7 +6,7 @@ import { useAddNewScenarioMutation, useAddTemplateToScenarioMutation } from "../
 
 // ==> Component property definition
 interface CreateScenarioPageProps {
-
+    closeCreateTabFcn: Function;
 }
 
 // ==> React Component
@@ -20,7 +20,6 @@ const CreateScenarioPage = (props: CreateScenarioPageProps) => {
     const [linkTemplateToScenario] = useAddTemplateToScenarioMutation();
 
     // Function to track currently selected template
-
     const LinkTemplate = (templateId: number, method: string) => {
         let foundTemplate = linkedTemplates.find(element => element == templateId);
         if (method == "add" && !foundTemplate) {
@@ -50,6 +49,8 @@ const CreateScenarioPage = (props: CreateScenarioPageProps) => {
                 let linkTemplatesPromises: Promise<any>[] = [];
                 linkedTemplates.forEach((templateId) => linkTemplatesPromises.push(linkTemplateToScenario([newScenarioId, templateId])));
                 await Promise.allSettled(linkTemplatesPromises);
+                // Close the create form
+                props.closeCreateTabFcn();
             });
         }
     }

@@ -5,7 +5,6 @@ import TemplateDataDisplay from "./TemplateDataDisplay";
 import TemplateDataForm from "./TemplateDataForm";
 
 interface TemplateDataProps {
-    templateDataName: string;
     dataModel: any;
     scenarioName: string;
     template: any;
@@ -64,14 +63,14 @@ const TemplateData = (props: TemplateDataProps) => {
 
     // Control Elements
     const standardButtonGroup: JSX.Element = <ButtonGroup className="m-2">
-        <Button className="m-0" variant="primary" onClick={ViewAddForm}>Add {props.templateDataName}</Button>
-        <Button className="m-0" variant="primary" onClick={ViewEditForm}>Edit {props.templateDataName}</Button>
-        <Button className="m-0" variant="primary" onClick={RemoveItem}>{isItemRemoving ? <Spinner /> : `Remove ${props.templateDataName}`}</Button>
+        <Button className="m-0" variant="primary" onClick={ViewAddForm}>Add {props.template.name}</Button>
+        <Button className="m-0" variant="primary" onClick={ViewEditForm}>Edit {props.template.name}</Button>
+        <Button className="m-0" variant="primary" onClick={RemoveItem}>{isItemRemoving ? <Spinner /> : `Remove ${props.template.name}`}</Button>
     </ButtonGroup>;
 
     // render the component
     return <div style={{ width: '100%' }}>
-        <h4>{props.templateDataName}</h4>
+        <h4>{props.template.name}</h4>
         {viewDataForm ? null : standardButtonGroup}
         {
             viewDataForm ? <TemplateDataForm dataModel={props.dataModel} submitFcn={SubmitForm} cancelFcn={CancelForm} data={isFormInEditMode ? currentlySelectedItem : undefined} /> :

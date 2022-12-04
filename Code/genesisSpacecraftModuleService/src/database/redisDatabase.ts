@@ -73,7 +73,7 @@ export const getIpAddress = () => {
 const SendKeepAlive = (redisClient: RedisClientType, currentAddress: string, keepAliveSecs: number) => {
     return new Promise<void>((resolve, reject) => {
         redisClient.connect().then(() => {
-            redisClient.set("genesis.broker.genesisScenarioService", currentAddress, { EX: keepAliveSecs })
+            redisClient.set("genesis.broker.genesisSpacecraftModuleService", currentAddress, { EX: keepAliveSecs })
                 .then(() => {
                     redisClient.disconnect();
                     resolve();

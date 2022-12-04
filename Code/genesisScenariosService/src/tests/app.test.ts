@@ -11,9 +11,9 @@ const scenario2: Scenario = { id: 2, name: "Scenario 2", description: "Sceanrio 
 const scenarioToAdd: Scenario = { name: "Scenario Add", description: "Sceanrio Add description here", lastUpdated: "", templateIds: [] };
 
 // Dummy Template Objects
-const template1: Template = {};
-const template2: Template = {};
-const templateToAdd: Template = {};
+// const template1: Template = {};
+// const template2: Template = {};
+// const templateToAdd: Template = {};
 
 // Mock the MySQl Database calls
 jest.spyOn(databaseQueries, 'GetScenarios').mockResolvedValue([scenario1, scenario2]);
@@ -21,7 +21,7 @@ jest.spyOn(databaseQueries, 'GetScenario').mockImplementation(async (id: number)
 jest.spyOn(databaseQueries, 'AddScenario').mockImplementation(async (scenario: Scenario) => { scenario['id'] = 3; return scenario; });
 
 
-jest.spyOn(databaseQueries, 'GetTemplates').mockResolvedValue([template1, template2]);
+// jest.spyOn(databaseQueries, 'GetTemplates').mockResolvedValue([template1, template2]);
 
 // Testing Crud Actions
 describe("Testing the Create Routes", () => {

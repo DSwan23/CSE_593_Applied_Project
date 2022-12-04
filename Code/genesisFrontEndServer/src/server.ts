@@ -68,6 +68,8 @@ app.use('/TemplateDatabase', express.static(path.resolve(__dirname, '../../Templ
 // Setup the routes to be used by this service
 routes(app, commonLogger);
 
+// Setup the Socket IO connection
+
 // More middleware
 // Log any error responses
 app.use(expressErrLogger);

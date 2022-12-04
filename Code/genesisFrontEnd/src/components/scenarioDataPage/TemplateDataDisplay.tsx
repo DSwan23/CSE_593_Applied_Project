@@ -33,8 +33,8 @@ const TemplateDataDisplay = (props: TemplateDataDisplayProps) => {
     }
 
     // Data Elements
-    if (isTemplateDataLoaded && headerValues.length > 0) {
-        templateData.forEach((element: any) => {
+    if (isTemplateDataLoaded && headerValues.length > 0 && templateData && templateData.length > 0) {
+        templateData?.forEach((element: any) => {
             let dataColumns: JSX.Element[] = [];
             let modelObject = new props.dataModel.Spacecraft(element);
             for (let field of headerValues) {

@@ -28,18 +28,16 @@ const ScenarioDataPage = (props: ScenarioDataPageProps) => {
         scenario?.templateIds.forEach((templateId: number) => {
             templateTabs.push(
                 <Tab eventKey={`TemplateTab${templateId}`} title={`Template ${templateId}`} >
-                    <DataModelWrapper templateId={templateId} scenarioName="Test_Schmea" />
+                    <DataModelWrapper templateId={templateId} scenarioName={scenario.name.split(" ").join("_")} />
                 </Tab >
             )
         })
     }
     // Render the component
-    // TODO: Use actual scenario name here
-    return <div id="ScenarioDataPage" style={{ display: "flex", flexFlow: "row nowrap", color: "white", backgroundColor: "#242424" }}>
+    return <div id="ScenarioDataPage" style={{ color: "white", backgroundColor: "#242424" }}>
         <Tabs variant='dark' style={{ height: '100%' }}>
             {templateTabs}
         </Tabs>
-        {/* <DataModelWrapper templateId={1} scenarioName="Test_Schmea" /> */}
     </div>
 }
 

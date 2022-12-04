@@ -17,7 +17,11 @@ const DataModelWrapper = (props: DataModelWrapperProps) => {
     // Load the data model from the template file storage location
     useMemo(() => {
         const loadData = async () => {
-            let result = await import(/* @vite-ignore */ "http:\\127.0.0.1:8000\\TemplateDatabase\\" + template?.filepath + "DataModel.js");
+            console.log(template?.filepath);
+            // Check to see if the filepath ends with a slash
+            let lastCharacter = template.filepath.slice(-1);
+            let endsWithSlash = lastCharacter == "\\" || lastCharacter == "/";
+            let result = await import(/* @vite-ignore */ `http:\\127.0.0.1:8000\\TemplateDatabase\\${template?.filepath}${endsWithSlash ? "" : "\\"}DataModel.js`);
             setDataModel(result);
         }
         if (isTemplateLoaded)
@@ -25,7 +29,7 @@ const DataModelWrapper = (props: DataModelWrapperProps) => {
     }, [template])
 
     // return isTemplateLoaded && dataModel ? <div style={{ width: '100%' }}> <TemplateDataDisplay templateName={template?.name} templatePath={template?.filepath} scenarioName={props.scenarioName} dataModel={dataModel} /> <TemplateDataForm dataModel={dataModel} /> </div> : <Spinner />
-    return isTemplateLoaded && dataModel ? <TemplateData templateDataName="Spacecraft" dataModel={dataModel} scenarioName={props.scenarioName} template={template} /> : <Spinner />
+    return isTemplateLoaded && dataModel ? <TemplateData dataModel={dataModel} scenarioName={props.scenarioName} template={template} /> : <Spinner />
 }
 
 export default DataModelWrapper;
